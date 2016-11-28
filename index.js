@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const async = require('async');
 const jsonfile = require('jsonfile');
 const log = require('./logger').log;
