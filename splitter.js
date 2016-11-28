@@ -4,10 +4,14 @@ const moment = require('moment');
 const async = require('async');
 const chalk = require('chalk');
 const randomstring = require('randomstring');
+const argv = require('minimist')(process.argv.slice(2));
 const log = require('./logger').log;
 
+var verbose = argv.verbose ? argv.verbose : false;
 var folder, branch, sourceOrigin, targetOrigin;
 var tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushForceCmd;
+var spinners;
+
 
 function clone(callback) {
 	log(chalk.blue.bold('Cloning repository...'));
@@ -16,7 +20,7 @@ function clone(callback) {
 		if (error) throw new Error(error);
 		if (stdout) log(chalk.green(stdout));
 
-		callback(null);
+		callback();
 	});
 }
 
@@ -27,7 +31,7 @@ function checkout(callback) {
 	  	if (error) throw new Error(error);
 		if (stdout) log(chalk.green(stdout));
 
-		callback(null);
+		callback();
 	});
 }
 
@@ -38,7 +42,7 @@ function filterBranch(callback) {
 	  	if (error) throw new Error(error);
 		if (stdout) log(chalk.green(stdout));
 
-		callback(null);
+		callback();
 	});
 }
 
@@ -49,7 +53,7 @@ function changeOrigin(callback) {
 	  	if (error) throw new Error(error);
 		if (stdout) log(chalk.green(stdout));
 
-		callback(null);
+		callback();
 	});
 }
 
@@ -61,7 +65,7 @@ function pushForce(callback) {
 	  	if (error) throw new Error(error);
 		if (stdout) log(chalk.green(stdout));
 
-		callback(null);
+		callback();
 	});
 }
 
@@ -74,17 +78,23 @@ function run(mainCallback) {
 	    changeOrigin,
 	    pushForce
 	], function (err) {
-	    if (err) log(chalk.bold.red(err));
+	    if (err) {
+	    	log(chalk.bold.red(err));
+	    	if (!verbose) spinners.error(folder);
+	    } else {
+	    	if (!verbose) spinners.success(folder);
+	    }
 
 	    mainCallback(err);
 	});
 }
 
-function split(source, target, folder, branch, mainCallback) {
-	folder = folder;
-	branch = branch;
+function split(source, target, fld, brch, spnn, mainCallback) {
+	folder = fld;
+	branch = brch;
 	sourceOrigin = source;
 	targetOrigin = target;
+	spinners = spnn;
 
 	tmpFolder = format('/tmp/gitsplitter/%s/%s/', moment().valueOf(), randomstring.generate());
 	gitCloneCmd = format('git clone %s %s', sourceOrigin, tmpFolder);
