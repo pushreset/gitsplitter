@@ -17,7 +17,7 @@ function clone(callback) {
 	log(chalk.blue.bold('Cloning repository...'));
 
 	exec(gitCloneCmd, function(error, stdout, stderr) {
-		if (error) throw new Error(error);
+		if (error) return callback(error);
 		if (stdout) log(chalk.green(stdout));
 
 		callback();
@@ -28,7 +28,7 @@ function checkout(callback) {
 	log(chalk.blue.bold('Checkout repository...'));
 
 	exec(gitCheckoutCmd, function(error, stdout, stderr) {
-	  	if (error) throw new Error(error);
+	  	if (error) return callback(error);
 		if (stdout) log(chalk.green(stdout));
 
 		callback();
@@ -39,7 +39,7 @@ function filterBranch(callback) {
 	log(chalk.blue.bold('Splitting repository...'));
 
 	exec(gitSplitCmd, function(error, stdout, stderr) {
-	  	if (error) throw new Error(error);
+	  	if (error) return callback(error);
 		if (stdout) log(chalk.green(stdout));
 
 		callback();
@@ -50,7 +50,7 @@ function changeOrigin(callback) {
 	log(chalk.blue.bold('Update repository origin...'));
 
 	exec(gitOriginCmd, function(error, stdout, stderr) {
-	  	if (error) throw new Error(error);
+	  	if (error) return callback(error);
 		if (stdout) log(chalk.green(stdout));
 
 		callback();
@@ -62,12 +62,18 @@ function pushForce(callback) {
 
 	//TODO: control remote before push force
 	exec(gitPushForceCmd, function(error, stdout, stderr) {
-	  	if (error) throw new Error(error);
+	  	if (error) return callback(error);
 		if (stdout) log(chalk.green(stdout));
 
 		callback();
 	});
 }
+
+//TODO: delete temp folder on process ending/error
+function clean(callback) {
+	callback();
+}
+
 
 function run(mainCallback) {
 	//TODO: delete temp folder on process ending/error
@@ -76,7 +82,8 @@ function run(mainCallback) {
 	    checkout,
 	    filterBranch,
 	    changeOrigin,
-	    pushForce
+	    pushForce,
+	    clean
 	], function (err) {
 	    if (err) {
 	    	log(chalk.bold.red(err));
@@ -85,7 +92,7 @@ function run(mainCallback) {
 	    	if (!verbose) spinners.success(folder);
 	    }
 
-	    mainCallback(err);
+	    mainCallback();
 	});
 }
 
