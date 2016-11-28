@@ -1,6 +1,6 @@
 const async = require('async');
 const jsonfile = require('jsonfile');
-const log = console.log;
+const log = require('./logger').log;
 const chalk = require('chalk');
 var argv = require('minimist')(process.argv.slice(2));
 const splitter = require('./splitter').split;

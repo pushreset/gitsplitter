@@ -4,7 +4,7 @@ const moment = require('moment');
 const async = require('async');
 const chalk = require('chalk');
 const randomstring = require('randomstring');
-const log = console.log;
+const log = require('./logger').log;
 
 var folder, branch, sourceOrigin, targetOrigin;
 var tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushForceCmd;
