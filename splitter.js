@@ -7,10 +7,10 @@ const randomstring = require('randomstring');
 const argv = require('minimist')(process.argv.slice(2));
 const log = require('./logger').log;
 
-var verbose = argv.verbose ? argv.verbose : false;
-var folder, branch, sourceOrigin, targetOrigin;
-var tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushForceCmd;
-var spinners;
+let verbose = argv.verbose ? argv.verbose : false;
+let folder, branch, sourceOrigin, targetOrigin;
+let tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushForceCmd;
+let spinners;
 
 
 function clone(callback) {

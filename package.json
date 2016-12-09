@@ -1,5 +1,5 @@
 {
-  "name": "@pushreset/gitsplitter",
+  "name": "gitsplitter",
   "version": "1.0.0",
   "description": "Git 1.8\r NodeJS 6.0.0",
   "preferGlobal": true,
@@ -8,7 +8,7 @@
     "split": "node index.js"
   },
   "bin": {
-    "gitsplitter": "index.js"
+    "gitsplitter": "./index.js"
   },
   "author": "jduvignau",
   "license": "ISC",
@@ -22,7 +22,6 @@
     "multispinner": "^0.2.1",
     "randomstring": "^1.1.5"
   },
-  "bin": {},
   "devDependencies": {},
   "repository": {
     "type": "git",

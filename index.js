@@ -1,5 +1,7 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
+const path = require('path');
+const readline = require('readline');
 const async = require('async');
 const jsonfile = require('jsonfile');
 const log = require('./logger').log;
@@ -8,17 +10,20 @@ const argv = require('minimist')(process.argv.slice(2));
 const splitter = require('./splitter').split;
 const Multispinner = require('multispinner');
 const _ = require('lodash');
+const conf = require(path.join(process.cwd(), 'gitsplit.json'));
 
-var file = 'gitsplit.json';
-var verbose = argv.verbose ? argv.verbose : false;
-var branch = argv.branch ? argv.branch : 'master';
-var conf, mode, spinners;
+let verbose = argv.verbose ? argv.verbose : false;
+let branch = argv.branch ? argv.branch : conf.defaultBranch;
+let selectedFolders = argv.folders ? argv.folders : null;
+let mode, spinners, folders;
+let start = new Date();
 
 function setup(callback) {
-	jsonfile.readFile(file, function(err, data) {
-		conf = data;
-
-		var folders = _.map(conf.folders, 'name');
+		if (selectedFolders) {
+			folders = selectedFolders.split(',');
+		} else {
+			folders = _.map(conf.folders, 'name');
+		}
 
 		if (!verbose) {
 			spinners = new Multispinner(folders, {
@@ -32,11 +37,16 @@ function setup(callback) {
 		}
 
 		callback();
-	});
 }
 
 function split(callback) {
-	async.eachSeries(conf.folders, function(folder, callbackEach) {
+
+	async.eachSeries(folders, function(folderName, callbackEach) {
+		const folder = conf.folders[folderName];
+
+		if (!folder) {
+			throw new Error('Folder is not present in configuration: ' + folderName);
+		}
 
 		splitter(
 			conf.source_repository,
@@ -51,7 +61,11 @@ function split(callback) {
 	    if( err ) {
 	    	console.error(err);
 	    } else {
+
 	    	log(chalk.bold.bgGreen('All folders have been splitted successfully'));
+
+	    	const end = new Date() - start;
+			log(chalk.bold.bgGreen(`Execution time: ${end}ms`));
 	    }
 
 	    callback();
@@ -63,7 +77,7 @@ function run() {
 	    setup,
 	    split
 	], function (err, result) {
-	    if (err) log(chalk.bold.red(err));
+	    if (err) console.error(err);
 	});
 }
 
