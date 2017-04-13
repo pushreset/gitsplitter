@@ -1,7 +1,7 @@
 {
   "name": "gitsplitter",
   "version": "1.0.1",
-  "description": "Git 1.8\r NodeJS 6.0.0",
+  "description": "A nodejs cli tool to split monolithic GIT repository",
   "preferGlobal": true,
   "main": "index.js",
   "scripts": {
