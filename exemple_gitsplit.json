@@ -1,5 +1,6 @@
 {
 	"temp_path": "/tmp/gitsplitter/",
+	"clean_temp_folder": true,
 	"source_repository": "git@bitbucket.org:jduvignau/test_git_split.git",
 	"master_branch": "master",
 	"default_branch": "master",

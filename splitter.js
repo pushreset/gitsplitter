@@ -9,7 +9,7 @@ const log = require('./logger').log;
 
 let verbose = argv.verbose ? argv.verbose : false;
 let folder, branch, forcePush, sourceOrigin, targetOrigin;
-let tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushCmd;
+let tmpFolder, cleanFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushCmd, cleanCmd;
 let spinners;
 
 
@@ -72,7 +72,16 @@ function push(callback) {
 
 //TODO: delete temp folder on process ending/error
 function clean(callback) {
-	callback();
+	if (!cleanFolder) return callback();
+
+	log(chalk.blue.bold('Clean temp folder'));
+
+	exec(cleanCmd, function (error, stdout) {
+		if (error) return callback(error);
+		if (stdout) log(chalk.green(stdout));
+
+		callback();
+	});
 }
 
 
@@ -97,20 +106,22 @@ function run(mainCallback) {
 	});
 }
 
-function split(source, target, fld, brch, fPush, spnn, mainCallback) {
+function split(source, target, fld, brch, fPush, tmpFld, cleanFld, spnn, mainCallback) {
 	folder = fld;
 	branch = brch;
 	forcePush = fPush;
 	sourceOrigin = source;
 	targetOrigin = target;
 	spinners = spnn;
+	cleanFolder = cleanFld;
 
-	tmpFolder = format('/tmp/gitsplitter/%s/%s/', moment().valueOf(), randomstring.generate());
+	tmpFolder = format('%s/%s-%s/', tmpFld, moment().valueOf(), randomstring.generate());
 	gitCloneCmd = format('git clone %s %s', sourceOrigin, tmpFolder);
 	gitLogCmd = format('git -C %s log', tmpFolder);
 	gitCheckoutCmd = format('git -C %s checkout %s', tmpFolder, branch);
 	gitSplitCmd = format('git -C %s filter-branch --force --prune-empty --subdirectory-filter %s %s', tmpFolder, folder, branch);
 	gitOriginCmd = format('git -C %s remote set-url origin %s', tmpFolder, targetOrigin)
+	cleanCmd = format('rm -r %s', tmpFolder);
 
 	if (forcePush) {
 		gitPushCmd = format('git -C %s push -u -f origin %s', tmpFolder, branch);

@@ -3,5 +3,6 @@
 	"master_branch": "master",
 	"allow_push_force": true,
 	"push_force_on_master": false,
-	"default_branch": "master"
+	"default_branch": "master",
+	"clean_temp_folder": false
 }

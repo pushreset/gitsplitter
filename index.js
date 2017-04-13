@@ -44,6 +44,7 @@ function setup(callback) {
 
 function split(callback) {
 	const pushForce = ((conf.allow_push_force === true) && !(branch === conf.master_branch && conf.push_force_on_master === false)) ? true : false;
+	const cleanTmpFolder = conf.clean_temp_folder;
 
 	async.eachSeries(folders, function(folderName, callbackEach) {
 		const folder = conf.folders[folderName];
@@ -58,6 +59,8 @@ function split(callback) {
 			folder.name,
 			branch,
 			pushForce,
+			conf.temp_path,
+			cleanTmpFolder,
 			spinners,
 			callbackEach
 		);
