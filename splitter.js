@@ -8,8 +8,8 @@ const argv = require('minimist')(process.argv.slice(2));
 const log = require('./logger').log;
 
 let verbose = argv.verbose ? argv.verbose : false;
-let folder, branch, sourceOrigin, targetOrigin;
-let tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushForceCmd;
+let folder, branch, forcePush, sourceOrigin, targetOrigin;
+let tmpFolder, gitCloneCmd, gitLogCmd, gitCheckoutCmd, gitSplitCmd, gitOriginCmd, gitPushCmd;
 let spinners;
 
 
@@ -57,11 +57,12 @@ function changeOrigin(callback) {
 	});
 }
 
-function pushForce(callback) {
-	log(chalk.blue.bold('Push --force repository...'));
+function push(callback) {
+	log(chalk.blue.bold('Push repository...'));
+	log(chalk.blue.yellow(gitPushCmd));
 
 	//TODO: control remote before push force
-	exec(gitPushForceCmd, function(error, stdout, stderr) {
+	exec(gitPushCmd, function(error, stdout, stderr) {
 	  	if (error) return callback(error);
 		if (stdout) log(chalk.green(stdout));
 
@@ -82,7 +83,7 @@ function run(mainCallback) {
 	    checkout,
 	    filterBranch,
 	    changeOrigin,
-	    pushForce,
+	    push,
 	    clean
 	], function (err) {
 	    if (err) {
@@ -92,13 +93,14 @@ function run(mainCallback) {
 	    	if (!verbose) spinners.success(folder);
 	    }
 
-	    mainCallback();
+	    mainCallback(err);
 	});
 }
 
-function split(source, target, fld, brch, spnn, mainCallback) {
+function split(source, target, fld, brch, fPush, spnn, mainCallback) {
 	folder = fld;
 	branch = brch;
+	forcePush = fPush;
 	sourceOrigin = source;
 	targetOrigin = target;
 	spinners = spnn;
@@ -109,7 +111,12 @@ function split(source, target, fld, brch, spnn, mainCallback) {
 	gitCheckoutCmd = format('git -C %s checkout %s', tmpFolder, branch);
 	gitSplitCmd = format('git -C %s filter-branch --force --prune-empty --subdirectory-filter %s %s', tmpFolder, folder, branch);
 	gitOriginCmd = format('git -C %s remote set-url origin %s', tmpFolder, targetOrigin)
-	gitPushForceCmd = format('git -C %s push -u -f origin %s', tmpFolder, branch);
+
+	if (forcePush) {
+		gitPushCmd = format('git -C %s push -u -f origin %s', tmpFolder, branch);
+	} else {
+		gitPushCmd = format('git -C %s push -u origin %s', tmpFolder, branch);
+	}
 
 	log(chalk.bold.bgGreen(format('Splitting: %s', sourceOrigin)));
 	log(chalk.yellow(format('folder: %s', folder)));

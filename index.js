@@ -10,15 +10,18 @@ const argv = require('minimist')(process.argv.slice(2));
 const splitter = require('./splitter').split;
 const Multispinner = require('multispinner');
 const _ = require('lodash');
+const baseConf = require(path.join(__dirname, 'gitsplit.json'));
 const conf = require(path.join(process.cwd(), 'gitsplit.json'));
 
 let verbose = argv.verbose ? argv.verbose : false;
-let branch = argv.branch ? argv.branch : conf.defaultBranch;
+let branch = argv.branch ? argv.branch : conf.default_branch || conf.defaultBranch;
 let selectedFolders = argv.folders ? argv.folders : null;
 let mode, spinners, folders;
 let start = new Date();
 
 function setup(callback) {
+		_.merge(conf, baseConf);
+
 		if (selectedFolders) {
 			folders = selectedFolders.split(',');
 		} else {
@@ -40,6 +43,7 @@ function setup(callback) {
 }
 
 function split(callback) {
+	const pushForce = ((conf.allow_push_force === true) && !(branch === conf.master_branch && conf.push_force_on_master === false)) ? true : false;
 
 	async.eachSeries(folders, function(folderName, callbackEach) {
 		const folder = conf.folders[folderName];
@@ -53,6 +57,7 @@ function split(callback) {
 			folder.target_repository,
 			folder.name,
 			branch,
+			pushForce,
 			spinners,
 			callbackEach
 		);

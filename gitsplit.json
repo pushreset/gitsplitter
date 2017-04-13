@@ -1,14 +1,7 @@
 {
 	"temp_path": "/tmp/gitsplitter/",
-	"source_repository": "git@bitbucket.org:jduvignau/test_git_split.git",
-	"folders" : {
-		"folder_a": {
-			"name": "folder_a",
-			"target_repository": "git@bitbucket.org:jduvignau/test_git_split_target_a.git"
-		},
-		"folder_b": {
-			"name": "folder_b",
-			"target_repository": "git@bitbucket.org:jduvignau/test_git_split_target_b.git"
-		}
-	}
+	"master_branch": "master",
+	"allow_push_force": true,
+	"push_force_on_master": false,
+	"default_branch": "master"
 }
